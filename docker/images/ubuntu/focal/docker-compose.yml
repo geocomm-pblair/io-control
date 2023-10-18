@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+
+  ubuntu-focal:
+    image: ${IMAGE}:${TAG}
+    container_name: ${IMAGE}
+    stdin_open: true
+    tty: true
+    environment:
+      - DEV=1
+      - NONROOT_PASSWORD=fossa
+    volumes:
+      - type: bind
+        source: ./shared
+        target: /shared
+    ports:
+      - "${SSH_PORT}:22"
+
+networks:
+  ${IMAGE}:
+    driver: bridge

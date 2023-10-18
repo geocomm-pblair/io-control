@@ -1,0 +1,78 @@
+set dotenv-load
+set shell := ["bash", "-uc"]
+
+project := `cd ../../../..; basename ${PWD}`
+image := env_var('IMAGE')
+version := env_var('VERSION')
+base_image := env_var('BASE_IMAGE')
+gdal := env_var('GDAL')
+proj := env_var('PROJ')
+python := env_var('PYTHON')
+ssh_port := env_var('SSH_PORT')
+
+# Clean up dangling images.
+clean:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    reference=$(docker images -f "reference={{image}}" -q)
+    if [ ! -z "$reference" ]; then
+        docker rmi --force "$reference"
+    fi
+    while [ ! -z $(docker images -f "dangling=true" -q) ]; do
+        docker rmi --force $(docker images -f "dangling=true" -q)
+    done
+
+
+# Build the container image.
+build:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    image_name="{{project}}-{{image}}"
+    echo "Building ${image_name}..."
+    docker build -t ${image_name} \
+        --network=host \
+        --build-arg PROJ={{proj}} \
+        --build-arg GDAL={{gdal}} \
+        --build-arg IMAGE_NAME=${image_name} \
+        --build-arg IMAGE_VERSION={{version}} \
+        --build-arg PYTHON={{python}} \
+        --build-arg BASE_IMAGE={{base_image}} \
+        .
+        docker tag ${image_name} ${image_name}:{{version}}
+
+# Stop the container.
+down:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Here we go...
+    export IMAGE={{image}}
+    export TAG={{version}}
+    docker-compose down
+
+# Get the container image name.
+@image:
+    echo "{{project}}-{{image}}"
+
+# Shell into the container.
+@login user='nonroot':
+	docker exec -it --user {{user}} "{{project}}-{{image}}" /bin/bash
+
+# Open an SSH session to the container.
+@ssh user='nonroot':
+    ssh -p {{ssh_port}} {{user}}@localhost
+
+# Run the container.
+up:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Here we go...
+    mkdir -p ./shared
+    chmod 777 ./shared
+    export IMAGE="{{project}}-{{image}}"
+    export TAG={{version}}
+    export SSH_PORT={{ssh_port}}
+    docker-compose up --remove-orphans
+
+# Get the current version.
+@version:
+    echo {{version}}

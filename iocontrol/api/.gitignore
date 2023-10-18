@@ -1,0 +1,3 @@
+# Everything in the static folder is generated, except for the .gitkeep file.
+static/*
+!static/.gitkeep

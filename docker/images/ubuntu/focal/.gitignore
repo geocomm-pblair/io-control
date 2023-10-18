@@ -1,0 +1,5 @@
+# Keep the local .env file.
+!.env
+
+# Don't check in files shared with the container.
+shared

@@ -1,0 +1,19 @@
+{
+    "sub": "{{sub}}",
+    "roles": [
+        "Consumer"
+    ],
+    "permissions": [],
+    "tenantId": "{{tenant_id}}",
+    "type": "userToken",
+    "metadata": {},
+    "name": "{{name}}",
+    "email": "{{email}}",
+    "email_verified": true,
+    "tenantIds": [
+        "{{tenant_id}}"
+    ],
+    "profilePictureUrl": null,
+    "superUser": null,
+    "createdByUserId": null
+}
