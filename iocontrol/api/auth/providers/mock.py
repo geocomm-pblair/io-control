@@ -7,16 +7,15 @@ from typing import Tuple
 
 import jwt
 from faker import Faker
-from random_word import RandomWords
-
 from iocontrol import logging
 from iocontrol import strings
-from iocontrol.api.auth.errors import ForbiddenException
+from iocontrol.api.auth.errors import UnauthorizedException
 from iocontrol.api.auth.providers.base import SecurityProvider
 from iocontrol.api.auth.users import User
 from iocontrol.config import config
 from iocontrol.config.deploy import DeployLevel
 from iocontrol.errors import ConfigurationException
+from random_word import RandomWords
 
 
 @lru_cache()
@@ -133,6 +132,7 @@ class MockSecurityProvider(SecurityProvider):
         permissions: List[str] = None,
         auto_error: bool = True,
         roles: List[str] = None,
+        super_user: bool = False,
     ):
         """
         Configure endpoint security.
@@ -140,6 +140,7 @@ class MockSecurityProvider(SecurityProvider):
         :param permissions: required permissions
         :param auto_error: raise errors if security fails
         :param roles: required roles
+        :param super_user: requires super-user permissions
         """
         user_ = user()
 
@@ -147,6 +148,8 @@ class MockSecurityProvider(SecurityProvider):
             """Check user entitlements against the requirements."""
             if not auto_error:
                 return user_
+            if super_user and not user.super_user:
+                raise UnauthorizedException("You are not a super user.")
             forbidden = False
             for set_, required, assigned in [
                 (
@@ -168,7 +171,7 @@ class MockSecurityProvider(SecurityProvider):
                 )
             # If we detected insufficient roles or permissions.
             if forbidden:
-                raise ForbiddenException()
+                raise UnauthorizedException()
             # All good!
             return user_
 

@@ -18,6 +18,7 @@ from iocontrol.api import requests
 from iocontrol.api import static
 from iocontrol.api import system
 from iocontrol.api.debug import trace
+from iocontrol.api.tenants import router as tenants
 from iocontrol.config import config as app_config
 from iocontrol.config.deploy import DeployPlatform
 from iocontrol.errors import AppException
@@ -92,11 +93,13 @@ if app_config().api.debug:
         return await call_next(request)
 
 
-# Add the routers.
+# Add the system routers.
 app.include_router(auth.router, prefix="/api/auth")
 app.include_router(config.router, prefix="/api/config")
 # Add the root router and keep a reference.
 app.include_router(system.router, prefix="")
+# Add the tenant routers.
+app.include_router(tenants.router, prefix="/tenants")
 # Configure static files.
 static.configure(app)
 
@@ -155,5 +158,3 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     """Perform FastAPI application shutdown."""
-    # TODO: Clean up.
-    pass

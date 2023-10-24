@@ -12,8 +12,8 @@ from jinja2 import Template
 from pydantic import ConfigDict
 
 from iocontrol import meta
-from iocontrol.pydantic import Field
 from iocontrol.pydantic import BaseModel
+from iocontrol.pydantic import Field
 
 
 class EnvInit(BaseModel):

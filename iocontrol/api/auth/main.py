@@ -24,6 +24,7 @@ def security(
     permissions: List[str] = None,
     auto_error: bool = True,
     roles: List[str] = None,
+    super_user: bool = False,
 ):
     """
     Secure endpoints.
@@ -31,7 +32,11 @@ def security(
     :param permissions: required permissions
     :param auto_error: raise exceptions on security failure
     :param roles: required roles
+    :param super_user: requires super-user permissions
     """
     return provider().security(
-        permissions=permissions, auto_error=auto_error, roles=roles
+        permissions=permissions,
+        auto_error=auto_error,
+        roles=roles,
+        super_user=super_user,
     )

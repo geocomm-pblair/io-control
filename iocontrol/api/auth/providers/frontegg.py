@@ -1,11 +1,15 @@
 from functools import lru_cache
 from typing import List
 
+from fastapi import Depends
 from frontegg.fastapi import frontegg
-from frontegg.fastapi.secure_access import FronteggSecurity
-
 from iocontrol import logging
+from iocontrol.api.auth.errors import UnauthorizedException
 from iocontrol.api.auth.providers.base import SecurityProvider
+from iocontrol.api.auth.providers.vendorized import (
+    frontegg_security as vendorized,
+)
+from iocontrol.api.auth.users import User
 from iocontrol.config import config
 from iocontrol.errors import ConfigurationException
 
@@ -52,6 +56,7 @@ class FronteggSecurityProvider(SecurityProvider):
         permissions: List[str] = None,
         auto_error: bool = True,
         roles: List[str] = None,
+        super_user: bool = False,
     ):
         """
         Configure endpoint security.
@@ -59,7 +64,18 @@ class FronteggSecurityProvider(SecurityProvider):
         :param permissions: required permissions
         :param auto_error: raise errors if security fails
         :param roles: required roles
+        :param super_user: requires super-user permissions
         """
-        return FronteggSecurity(
-            permissions=permissions, auto_error=auto_error, roles=roles
-        )
+
+        def security_(
+            user: User = Depends(
+                vendorized.FronteggHTTPAuthentication(
+                    auto_error=auto_error, roles=roles, permissions=permissions
+                )
+            )
+        ) -> User:
+            if super_user and not user.super_user:
+                raise UnauthorizedException("You are not a super user.")
+            return user
+
+        return security_

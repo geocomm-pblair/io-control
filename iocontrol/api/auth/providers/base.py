@@ -18,6 +18,7 @@ class SecurityProvider(ABC):
         permissions: List[str] = None,
         auto_error: bool = True,
         roles: List[str] = None,
+        super_user: bool = None,
     ):
         """
         Configure endpoint security.
@@ -25,4 +26,5 @@ class SecurityProvider(ABC):
         :param permissions: required permissions
         :param auto_error: raise errors if security fails
         :param roles: required roles
+        :param super_user: requires super-user permissions
         """

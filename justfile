@@ -146,7 +146,7 @@ nvm:
     popd
 
 # Prepare the environment.
-ready: venv gdal
+ready: venv
     #!/usr/bin/env bash
     # Perform platform specific steps.
     case "{{os()}}" in

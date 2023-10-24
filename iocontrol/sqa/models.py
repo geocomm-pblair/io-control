@@ -1,5 +1,8 @@
-from sqlalchemy import Column, String
+from pydantic import BaseModel
+from pydantic import Field
+from sqlalchemy import Column
+from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
-from pydantic import BaseModel, Field
 
+#: base class for all SQLAlchemy models
 Base = declarative_base()

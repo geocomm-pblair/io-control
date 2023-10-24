@@ -1,13 +1,14 @@
-from typing import Optional, Literal
+from typing import Literal
+from typing import Optional
 
 from pydantic import conint
 from pydantic import SecretStr
 from pydantic_settings import SettingsConfigDict
 
+from iocontrol import meta
 from iocontrol.pydantic import BaseSettings
 from iocontrol.pydantic import env_prefix
 from iocontrol.pydantic import Field
-from iocontrol import meta
 
 
 class DbConfig(BaseSettings):

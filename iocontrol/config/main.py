@@ -1,9 +1,9 @@
 from functools import lru_cache
 from pathlib import Path
 
-from iocontrol.config.db import DbConfig
 from iocontrol import meta
 from iocontrol.config.api import ApiConfig
+from iocontrol.config.db import DbConfig
 from iocontrol.config.deploy import DeployConfig
 from iocontrol.config.logging import LoggingConfig
 from iocontrol.config.sqa import SQLAlchemyConfig

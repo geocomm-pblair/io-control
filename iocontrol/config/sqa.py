@@ -1,4 +1,6 @@
-from typing import Optional, Literal, Tuple
+from typing import Literal
+from typing import Optional
+from typing import Tuple
 
 from pydantic import conint
 from pydantic import SecretStr

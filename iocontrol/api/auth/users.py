@@ -1,9 +1,12 @@
-import frontegg.fastapi.secure_access.frontegg_security
+from iocontrol.api.auth.providers.vendorized import frontegg_security
+from pydantic import ConfigDict
 
 
-class User(frontegg.fastapi.secure_access.frontegg_security.User):
+class User(frontegg_security.User):
     """
     Describes a user.
 
     The ``User`` model is based on Frontegg's ``User``.
     """
+
+    model_config = ConfigDict(populate_by_name=True)
