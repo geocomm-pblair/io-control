@@ -116,3 +116,19 @@ class TenantOrm(Orm):
         ForeignKey("cells.id"), primary_key=True
     )
     cell: Mapped[CellOrm] = relationship(back_populates="tenants")
+    geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
+
+
+class ReadTenantModel(Model):
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(description="identifies the cell")
+    cell: ReadCellModel = Field(description="the cell in which the tenant resides")
+
+
+class TenantModelsPage(Page):
+    """A page of ``Tenant`` models."""
+
+    tenants: Tuple[ReadTenantModel, ...] = Field(
+        default_factory=tuple, description="the cells"
+    )
