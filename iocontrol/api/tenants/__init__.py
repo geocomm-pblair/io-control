@@ -1,3 +1,3 @@
-from . import clouds, regions
+from . import cells, clouds, regions
 
-__all__ = ["clouds", "regions"]
+__all__ = ["cells", "clouds", "regions"]

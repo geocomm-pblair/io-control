@@ -5,7 +5,7 @@ from geoalchemy2 import Geometry
 from pydantic import ConfigDict
 from pydantic import Field
 from sqlalchemy import ForeignKey, Column, UniqueConstraint
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, deferred
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
@@ -90,7 +90,7 @@ class CellOrm(Orm):
     region_id: Mapped[str] = mapped_column(ForeignKey("regions.id"))
     region: Mapped[RegionOrm] = relationship(back_populates="cells")
     tenants: Mapped[List["TenantOrm"]] = relationship(back_populates="cell")
-    geom = Column(Geometry("MULTIPOLYGON", srid=4326))
+    geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
 
 
 class ReadCellModel(Model):
@@ -98,10 +98,14 @@ class ReadCellModel(Model):
 
     id: str = Field(description="identifies the cell")
     region: ReadRegionModel = Field(description="the region in which the cell resides")
-    # cells: Tuple[str, ...] = Field(
-    #     default_factory=tuple,
-    #     description="the cells presently hosted in this cloud",
-    # )
+
+
+class CellModelsPage(Page):
+    """A page of ``Cell`` models."""
+
+    cells: Tuple[ReadCellModel, ...] = Field(
+        default_factory=tuple, description="the cells"
+    )
 
 
 class TenantOrm(Orm):
