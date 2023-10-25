@@ -16,11 +16,11 @@ class IPv4Network(TypeDecorator):
 
     impl = postgresql.INET
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect):  # noqa
         if value is not None:
             return str(value)
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, value, dialect):  # noqa
         return ip_network(value)
 
 
