@@ -13,6 +13,7 @@ class IPv4Network(TypeDecorator):
 
         https://docs.sqlalchemy.org/en/13/core/custom_types.html#augmenting-existing-types
     """
+
     impl = postgresql.INET
 
     def process_bind_param(self, value, dialect):

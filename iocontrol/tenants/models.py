@@ -39,6 +39,7 @@ class CloudOrm(Orm):
     id: Mapped[str] = mapped_column(primary_key=True)
     regions: Mapped[List["RegionOrm"]] = relationship(back_populates="cloud")
 
+
 class ReadCloudModel(Model):
     model_config = ConfigDict(frozen=True)
 
@@ -67,7 +68,7 @@ class RegionOrm(Orm):
     cells: Mapped[List["CellOrm"]] = relationship(back_populates="region")
 
     # Region names must be unique within a cloud.
-    UniqueConstraint('cloud_id', 'name', name='unq__regions')
+    UniqueConstraint("cloud_id", "name", name="unq__regions")
 
 
 class ReadRegionModel(Model):
@@ -75,7 +76,9 @@ class ReadRegionModel(Model):
 
     id: int = Field(description="uniquely identifies the region")
     name: str = Field(description="the name of the region")
-    cloud: ReadCloudModel = Field(description="the cloud that hosts the region")
+    cloud: ReadCloudModel = Field(
+        description="the cloud that hosts the region"
+    )
     # cells: Optional[Tuple["ReadCellModel", ...]] = Field(
     #     default=None,
     #     description="These are the cells presently hosted in this region.",
@@ -101,9 +104,7 @@ class CellIpV4NetworkOrm(Orm):
     doc = Column(types.JSONB)
 
 
-
 class ReadIpV4BlockModel(Model):
-
     id: int = Field(description="uniquely identifies the block")
     public: bool = Field(description="indicates a public address")
     network: IPv4Network = Field(description="the network block")
@@ -122,7 +123,9 @@ class CellOrm(Orm):
     region_id: Mapped[str] = mapped_column(ForeignKey("regions.id"))
     region: Mapped[RegionOrm] = relationship(back_populates="cells")
     tenants: Mapped[List["TenantOrm"]] = relationship(back_populates="cell")
-    ipv4networks: Mapped[List["CellIpV4NetworkOrm"]] = relationship(back_populates="cell")
+    ipv4networks: Mapped[List["CellIpV4NetworkOrm"]] = relationship(
+        back_populates="cell"
+    )
     geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
 
 
@@ -130,7 +133,9 @@ class ReadCellModel(Model):
     model_config = ConfigDict(frozen=True)
 
     id: str = Field(description="identifies the cell")
-    region: ReadRegionModel = Field(description="the region in which the cell resides")
+    region: ReadRegionModel = Field(
+        description="the region in which the cell resides"
+    )
 
 
 class CellModelsPage(Page):
@@ -139,12 +144,6 @@ class CellModelsPage(Page):
     cells: Tuple[ReadCellModel, ...] = Field(
         default_factory=tuple, description="the cells"
     )
-
-
-
-
-
-
 
 
 class TenantOrm(Orm):
@@ -162,7 +161,9 @@ class ReadTenantModel(Model):
     model_config = ConfigDict(frozen=True)
 
     id: str = Field(description="identifies the cell")
-    cell: ReadCellModel = Field(description="the cell in which the tenant resides")
+    cell: ReadCellModel = Field(
+        description="the cell in which the tenant resides"
+    )
 
 
 class TenantModelsPage(Page):

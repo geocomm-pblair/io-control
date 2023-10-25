@@ -3,10 +3,10 @@ from fastapi import Query
 from pydantic import conint
 from sqlalchemy.orm import Session
 
-from .router import router
 from iocontrol.api import responses
 from iocontrol.api.auth.main import security
 from iocontrol.api.auth.users import User
+from iocontrol.api.tenants.router import router
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import regions
 from iocontrol.tenants.models import CloudModelsPage

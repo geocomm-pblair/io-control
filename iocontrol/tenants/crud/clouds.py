@@ -6,9 +6,7 @@ from iocontrol.tenants.models import CloudOrm
 from iocontrol.tenants.models import ReadCloudModel
 
 
-def read(
-    db: Session, offset: int = 0, limit: int = 100
-) -> CloudModelsPage:
+def read(db: Session, offset: int = 0, limit: int = 100) -> CloudModelsPage:
     """Get a page of clouds."""
     # https://stackoverflow.com/questions/64371048/get-total-record-count-for-sqlalchemy-query-result-which-uses-paginationlimit
     query = db.query(CloudOrm, func.count(CloudOrm.id).over().label("total"))

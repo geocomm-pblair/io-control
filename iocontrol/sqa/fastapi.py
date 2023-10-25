@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from .engine import session_local
+from iocontrol.sqa.engine import session_local
 
 
 def session():
