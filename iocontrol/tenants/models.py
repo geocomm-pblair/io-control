@@ -1,16 +1,23 @@
-from typing import List, Optional
+from ipaddress import IPv4Network
+from typing import Any
+from typing import List
 from typing import Tuple
 
 from geoalchemy2 import Geometry
 from pydantic import ConfigDict
 from pydantic import Field
-from sqlalchemy import ForeignKey, Column, UniqueConstraint
-from sqlalchemy.orm import Mapped, deferred
+from pydantic import field_validator
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
+from sqlalchemy.orm import deferred
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 import iocontrol.pydantic
 import iocontrol.sqa.models
+from iocontrol.sqa import types
 from iocontrol.sqa.pages import Page
 
 
@@ -83,13 +90,39 @@ class RegionModelsPage(Page):
     )
 
 
+class CellIpV4NetworkOrm(Orm):
+    __tablename__ = "cell_ipv4networks"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    public: Mapped[bool] = mapped_column()
+    network = Column(types.IPv4Network)
+    cell_id: Mapped[str] = mapped_column(ForeignKey("cells.id"))
+    cell: Mapped[CloudOrm] = relationship(back_populates="ipv4networks")
+    doc = Column(types.JSONB)
+
+
+
+class ReadIpV4BlockModel(Model):
+
+    id: int = Field(description="uniquely identifies the block")
+    public: bool = Field(description="indicates a public address")
+    network: IPv4Network = Field(description="the network block")
+
+    @field_validator("network")
+    def validate_network(cls, v: Any) -> Any:
+        """Validate network."""
+        return IPv4Network(str(v)) if v else v
+
+
 class CellOrm(Orm):
     __tablename__ = "cells"
 
     id: Mapped[str] = mapped_column(primary_key=True)
+    max_tenants: Mapped[int] = mapped_column(default=40)
     region_id: Mapped[str] = mapped_column(ForeignKey("regions.id"))
     region: Mapped[RegionOrm] = relationship(back_populates="cells")
     tenants: Mapped[List["TenantOrm"]] = relationship(back_populates="cell")
+    ipv4networks: Mapped[List["CellIpV4NetworkOrm"]] = relationship(back_populates="cell")
     geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
 
 
@@ -106,6 +139,12 @@ class CellModelsPage(Page):
     cells: Tuple[ReadCellModel, ...] = Field(
         default_factory=tuple, description="the cells"
     )
+
+
+
+
+
+
 
 
 class TenantOrm(Orm):

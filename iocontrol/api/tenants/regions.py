@@ -9,7 +9,8 @@ from iocontrol.api.auth.main import security
 from iocontrol.api.auth.users import User
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import regions
-from iocontrol.tenants.models import CloudModelsPage, RegionModelsPage
+from iocontrol.tenants.models import CloudModelsPage
+from iocontrol.tenants.models import RegionModelsPage
 
 
 @router.get(

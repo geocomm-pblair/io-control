@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
 from iocontrol.tenants.models import ReadRegionModel
-from iocontrol.tenants.models import RegionOrm
 from iocontrol.tenants.models import RegionModelsPage
+from iocontrol.tenants.models import RegionOrm
 
 
 def read(

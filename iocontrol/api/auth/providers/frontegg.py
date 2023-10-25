@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import Depends
 from frontegg.fastapi import frontegg
+
 from iocontrol import logging
 from iocontrol.api.auth.errors import UnauthorizedException
 from iocontrol.api.auth.providers.base import SecurityProvider

@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
+from iocontrol.tenants.models import ReadTenantModel
 from iocontrol.tenants.models import TenantModelsPage
 from iocontrol.tenants.models import TenantOrm
-from iocontrol.tenants.models import ReadTenantModel
 
 
 def read(

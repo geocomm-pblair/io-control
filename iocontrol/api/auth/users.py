@@ -1,5 +1,6 @@
-from iocontrol.api.auth.providers.vendorized import frontegg_security
 from pydantic import ConfigDict
+
+from iocontrol.api.auth.providers.vendorized import frontegg_security
 
 
 class User(frontegg_security.User):

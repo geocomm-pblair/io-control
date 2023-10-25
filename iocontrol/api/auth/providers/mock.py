@@ -7,6 +7,8 @@ from typing import Tuple
 
 import jwt
 from faker import Faker
+from random_word import RandomWords
+
 from iocontrol import logging
 from iocontrol import strings
 from iocontrol.api.auth.errors import UnauthorizedException
@@ -15,7 +17,6 @@ from iocontrol.api.auth.users import User
 from iocontrol.config import config
 from iocontrol.config.deploy import DeployLevel
 from iocontrol.errors import ConfigurationException
-from random_word import RandomWords
 
 
 @lru_cache()

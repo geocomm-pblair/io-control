@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session, defer
+from sqlalchemy.orm import defer
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
 from iocontrol.tenants.models import CellModelsPage
