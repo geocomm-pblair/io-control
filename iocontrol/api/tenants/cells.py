@@ -17,6 +17,7 @@ from iocontrol.tenants.models import CellModelsPage
     name="get-cells",
     response_model=CellModelsPage,
     response_model_by_alias=True,
+    response_model_exclude_none=True,
     responses=responses.errors,
 )
 async def get_cells(

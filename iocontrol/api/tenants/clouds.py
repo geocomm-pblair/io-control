@@ -17,6 +17,7 @@ from iocontrol.tenants.models import CloudModelsPage
     name="get-clouds",
     response_model=CloudModelsPage,
     response_model_by_alias=True,
+    response_model_exclude_none=True,
     responses=responses.errors,
 )
 async def get_clouds(

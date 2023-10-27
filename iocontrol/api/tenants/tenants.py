@@ -17,6 +17,7 @@ from iocontrol.tenants.models import TenantModelsPage
     name="get-tenants",
     response_model=TenantModelsPage,
     response_model_by_alias=True,
+    response_model_exclude_none=True,
     responses=responses.errors,
 )
 async def get_tenants(

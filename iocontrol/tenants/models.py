@@ -1,6 +1,8 @@
 from ipaddress import IPv4Network
 from typing import Any
+from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 from geoalchemy2 import Geometry
@@ -10,6 +12,7 @@ from pydantic import field_validator
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
+from sqlalchemy.orm import declared_attr
 from sqlalchemy.orm import deferred
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -26,24 +29,37 @@ class Orm(iocontrol.sqa.models.Base):
 
     __abstract__ = True
 
+    @declared_attr
+    def doc(self):
+        """An entity document."""
+        return deferred(Column(types.JSONB))
+
 
 class Model(iocontrol.pydantic.BaseModel):
     """Pydantic model base class for tenant models."""
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    doc: Optional[Dict[str, Any]] = Field(
+        default=None, description="an entity document"
+    )
 
 
 class CloudOrm(Orm):
     __tablename__ = "clouds"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    urn: Mapped[str] = mapped_column(primary_key=True)
+    display_name: Mapped[str] = mapped_column(unique=True)
     regions: Mapped[List["RegionOrm"]] = relationship(back_populates="cloud")
 
 
 class ReadCloudModel(Model):
     model_config = ConfigDict(frozen=True)
 
-    id: str = Field(description="identifies the cloud")
+    urn: str = Field(description="identifies the cloud")
+    display_name: str = Field(
+        alias="displayName", description="the display name"
+    )
     # regions: Optional[Tuple["ReadRegionModel", ...]] = Field(
     #     default=None,
     #     description="These are the available regions within the cloud.",
@@ -61,21 +77,23 @@ class CloudModelsPage(Page):
 class RegionOrm(Orm):
     __tablename__ = "regions"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column()
-    cloud_id: Mapped[str] = mapped_column(ForeignKey("clouds.id"))
+    urn: Mapped[str] = mapped_column(primary_key=True)
+    display_name: Mapped[str] = mapped_column()
+    cloud_id: Mapped[str] = mapped_column(ForeignKey("clouds.urn"))
     cloud: Mapped[CloudOrm] = relationship(back_populates="regions")
     cells: Mapped[List["CellOrm"]] = relationship(back_populates="region")
 
     # Region names must be unique within a cloud.
-    UniqueConstraint("cloud_id", "name", name="unq__regions")
+    UniqueConstraint("cloud_id", "display_name", name="unq__regions")
 
 
 class ReadRegionModel(Model):
     model_config = ConfigDict(frozen=True)
 
-    id: int = Field(description="uniquely identifies the region")
-    name: str = Field(description="the name of the region")
+    urn: str = Field(description="uniquely identifies the region")
+    display_name: str = Field(
+        alias="displayName", description="the display name"
+    )
     cloud: ReadCloudModel = Field(
         description="the cloud that hosts the region"
     )
@@ -93,20 +111,36 @@ class RegionModelsPage(Page):
     )
 
 
-class CellIpV4NetworkOrm(Orm):
+class IpV4NetworkOrm(Orm):
+    __abstract__ = True
+
+    urn: Mapped[str] = mapped_column(primary_key=True)
+    # public: Mapped[bool] = mapped_column()
+    network = Column(types.IPv4Network, unique=True)
+
+
+class CellIpV4NetworkOrm(IpV4NetworkOrm):
     __tablename__ = "cell_ipv4networks"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    public: Mapped[bool] = mapped_column()
-    network = Column(types.IPv4Network)
-    cell_id: Mapped[str] = mapped_column(ForeignKey("cells.id"))
-    cell: Mapped[CloudOrm] = relationship(back_populates="ipv4networks")
-    doc = Column(types.JSONB)
+    cell_urn: Mapped[str] = mapped_column(ForeignKey("cells.urn"))
+    cell: Mapped["CellOrm"] = relationship(back_populates="ipv4networks")
+
+
+class TenantIpV4NetworkOrm(IpV4NetworkOrm):
+    __tablename__ = "tenant_ipv4networks"
+
+    cell_urn: Mapped[str] = mapped_column(ForeignKey("cells.urn"))
+    cell: Mapped["CellOrm"] = deferred(relationship())
+    tenant_urn: Mapped[str] = mapped_column(ForeignKey("tenants.urn"))
+    tenant: Mapped["TenantOrm"] = relationship(back_populates="ipv4networks")
+
+    UniqueConstraint(
+        "cell_urn", "tenant_urn", "network", name="unq__tenant_ipv4networks"
+    )
 
 
 class ReadIpV4BlockModel(Model):
-    id: int = Field(description="uniquely identifies the block")
-    public: bool = Field(description="indicates a public address")
+    urn: str = Field(description="uniquely identifies the block")
     network: IPv4Network = Field(description="the network block")
 
     @field_validator("network")
@@ -118,9 +152,10 @@ class ReadIpV4BlockModel(Model):
 class CellOrm(Orm):
     __tablename__ = "cells"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
-    max_tenants: Mapped[int] = mapped_column(default=40)
-    region_id: Mapped[str] = mapped_column(ForeignKey("regions.id"))
+    urn: Mapped[str] = mapped_column(primary_key=True)
+    display_name: Mapped[str] = mapped_column(unique=True)
+    max_tenants: Mapped[int] = mapped_column(default=500, server_default="500")
+    region_id: Mapped[str] = mapped_column(ForeignKey("regions.urn"))
     region: Mapped[RegionOrm] = relationship(back_populates="cells")
     tenants: Mapped[List["TenantOrm"]] = relationship(back_populates="cell")
     ipv4networks: Mapped[List["CellIpV4NetworkOrm"]] = relationship(
@@ -132,7 +167,10 @@ class CellOrm(Orm):
 class ReadCellModel(Model):
     model_config = ConfigDict(frozen=True)
 
-    id: str = Field(description="identifies the cell")
+    urn: str = Field(description="identifies the cell")
+    display_name: str = Field(
+        alias="displayName", description="the display name"
+    )
     region: ReadRegionModel = Field(
         description="the region in which the cell resides"
     )
@@ -149,18 +187,23 @@ class CellModelsPage(Page):
 class TenantOrm(Orm):
     __tablename__ = "tenants"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
-    cell_id: Mapped[str] = mapped_column(
-        ForeignKey("cells.id"), primary_key=True
-    )
+    urn: Mapped[str] = mapped_column(primary_key=True)
+    display_name: Mapped[str] = mapped_column(unique=True)
+    cell_urn: Mapped[str] = mapped_column(ForeignKey("cells.urn"))
     cell: Mapped[CellOrm] = relationship(back_populates="tenants")
+    ipv4networks: Mapped[List["TenantIpV4NetworkOrm"]] = relationship(
+        back_populates="tenant"
+    )
     geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
 
 
 class ReadTenantModel(Model):
     model_config = ConfigDict(frozen=True)
 
-    id: str = Field(description="identifies the cell")
+    urn: str = Field(description="identifies the tenant")
+    display_name: str = Field(
+        alias="displayName", description="the display name"
+    )
     cell: ReadCellModel = Field(
         description="the cell in which the tenant resides"
     )

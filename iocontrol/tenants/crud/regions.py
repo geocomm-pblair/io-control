@@ -8,8 +8,10 @@ from iocontrol.tenants.models import RegionOrm
 
 def read(db: Session, offset: int = 0, limit: int = 100) -> RegionModelsPage:
     """Get a page of clouds."""
-    query = db.query(RegionOrm, func.count(RegionOrm.id).over().label("total"))
-    query.order_by(RegionOrm.name)
+    query = db.query(
+        RegionOrm, func.count(RegionOrm.urn).over().label("total")
+    )
+    query.order_by(RegionOrm.display_name)
     query.offset(offset).limit(limit)
     results = query.all()
     if len(results) == 0:
