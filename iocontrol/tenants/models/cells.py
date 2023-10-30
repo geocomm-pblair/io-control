@@ -4,8 +4,8 @@ from pydantic import ConfigDict
 from pydantic import Field
 
 from iocontrol.sqa.pages import Page
-from iocontrol.tenants.pydantic.base import BaseModel
-from iocontrol.tenants.pydantic.regions import ReadRegion
+from iocontrol.tenants.models.base import BaseModel
+from iocontrol.tenants.models.regions import ReadRegion
 
 
 class ReadCell(BaseModel):

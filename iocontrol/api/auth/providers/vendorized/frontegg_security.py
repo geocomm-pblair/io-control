@@ -2,7 +2,7 @@
 NOTE TO THE FUTURE: This is a "vendor-ized" copy of Frontegg's
 `frontegg.fastapi.secure_access.frontegg_security` module.  The `User` class
 in the original module specifies some fields as "Optional" but doesn't
-provide defaults.  With pydantic 2.4.0 this seems to cause a validation error
+provide defaults.  With models 2.4.0 this seems to cause a validation error
 if the "superUser" and "createdByUserId" values are missing from the token.
 
 If you're reading this, please check **right now** to see if this has been

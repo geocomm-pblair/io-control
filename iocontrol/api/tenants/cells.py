@@ -9,7 +9,7 @@ from iocontrol.api.auth.users import User
 from iocontrol.api.tenants.router import router
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import cells
-from iocontrol.tenants.pydantic.cells import CellsPage
+from iocontrol.tenants.models.cells import CellsPage
 
 
 @router.get(

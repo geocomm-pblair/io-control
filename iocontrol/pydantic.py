@@ -112,7 +112,7 @@ json_encoders = {
 
 
 class BaseModel(pydantic.BaseModel):
-    """Extended pydantic Basemodel."""
+    """Extended models Basemodel."""
 
     model_config = ConfigDict(
         alias_generator=alias,
@@ -124,7 +124,7 @@ class BaseModel(pydantic.BaseModel):
 
 
 class BaseSettings(pydantic_settings.BaseSettings):
-    """Extended pydantic Basemodel."""
+    """Extended models Basemodel."""
 
     model_config = SettingsConfigDict(
         populate_by_name=False,

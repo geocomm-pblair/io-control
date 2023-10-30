@@ -4,8 +4,8 @@ from pydantic import ConfigDict
 from pydantic import Field
 
 from iocontrol.sqa.pages import Page
-from iocontrol.tenants.pydantic.base import BaseModel
-from iocontrol.tenants.pydantic.cells import ReadCell
+from iocontrol.tenants.models.base import BaseModel
+from iocontrol.tenants.models.cells import ReadCell
 
 
 class ReadTenant(BaseModel):

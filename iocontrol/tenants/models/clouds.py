@@ -4,7 +4,7 @@ from pydantic import ConfigDict
 from pydantic import Field
 
 from iocontrol.sqa.pages import Page
-from iocontrol.tenants.pydantic.base import BaseModel
+from iocontrol.tenants.models.base import BaseModel
 
 
 class ReadCloud(BaseModel):

@@ -13,7 +13,7 @@ class SQLAlchemyConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix=env_prefix("sql"))
 
     models: Tuple[str] = Field(
-        default=("{{this}}.tenants.sqa",), description="model libraries"
+        default=("{{this}}.tenants.orm",), description="model libraries"
     )
 
     echo: bool = Field(
