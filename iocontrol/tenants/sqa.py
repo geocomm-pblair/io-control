@@ -1,4 +1,3 @@
-from ipaddress import IPv4Network
 from typing import Any
 from typing import Dict
 from typing import List
@@ -8,7 +7,6 @@ from typing import Tuple
 from geoalchemy2 import Geometry
 from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import field_validator
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
@@ -87,30 +85,6 @@ class RegionOrm(Orm):
     UniqueConstraint("cloud_id", "display_name", name="unq__regions")
 
 
-class ReadRegionModel(Model):
-    model_config = ConfigDict(frozen=True)
-
-    urn: str = Field(description="uniquely identifies the region")
-    display_name: str = Field(
-        alias="displayName", description="the display name"
-    )
-    cloud: ReadCloudModel = Field(
-        description="the cloud that hosts the region"
-    )
-    # cells: Optional[Tuple["ReadCellModel", ...]] = Field(
-    #     default=None,
-    #     description="These are the cells presently hosted in this region.",
-    # )
-
-
-class RegionModelsPage(Page):
-    """A page of ``Region`` models."""
-
-    regions: Tuple[ReadRegionModel, ...] = Field(
-        default_factory=tuple, description="the regions"
-    )
-
-
 class IpV4NetworkOrm(Orm):
     __abstract__ = True
 
@@ -139,16 +113,6 @@ class TenantIpV4NetworkOrm(IpV4NetworkOrm):
     )
 
 
-class ReadIpV4BlockModel(Model):
-    urn: str = Field(description="uniquely identifies the block")
-    network: IPv4Network = Field(description="the network block")
-
-    @field_validator("network")
-    def validate_network(cls, v: Any) -> Any:
-        """Validate network."""
-        return IPv4Network(str(v)) if v else v
-
-
 class CellOrm(Orm):
     __tablename__ = "cells"
 
@@ -164,26 +128,6 @@ class CellOrm(Orm):
     geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
 
 
-class ReadCellModel(Model):
-    model_config = ConfigDict(frozen=True)
-
-    urn: str = Field(description="identifies the cell")
-    display_name: str = Field(
-        alias="displayName", description="the display name"
-    )
-    region: ReadRegionModel = Field(
-        description="the region in which the cell resides"
-    )
-
-
-class CellModelsPage(Page):
-    """A page of ``Cell`` models."""
-
-    cells: Tuple[ReadCellModel, ...] = Field(
-        default_factory=tuple, description="the cells"
-    )
-
-
 class TenantOrm(Orm):
     __tablename__ = "tenants"
 
@@ -195,23 +139,3 @@ class TenantOrm(Orm):
         back_populates="tenant"
     )
     geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
-
-
-class ReadTenantModel(Model):
-    model_config = ConfigDict(frozen=True)
-
-    urn: str = Field(description="identifies the tenant")
-    display_name: str = Field(
-        alias="displayName", description="the display name"
-    )
-    cell: ReadCellModel = Field(
-        description="the cell in which the tenant resides"
-    )
-
-
-class TenantModelsPage(Page):
-    """A page of ``Tenant`` models."""
-
-    tenants: Tuple[ReadTenantModel, ...] = Field(
-        default_factory=tuple, description="the cells"
-    )

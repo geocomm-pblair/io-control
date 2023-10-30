@@ -9,13 +9,13 @@ from iocontrol.api.auth.users import User
 from iocontrol.api.tenants.router import router
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import cells
-from iocontrol.tenants.models import CellModelsPage
+from iocontrol.tenants.pydantic.cells import CellsPage
 
 
 @router.get(
     "/cells",
     name="get-cells",
-    response_model=CellModelsPage,
+    response_model=CellsPage,
     response_model_by_alias=True,
     response_model_exclude_none=True,
     responses=responses.errors,
@@ -29,6 +29,6 @@ async def get_cells(
     ),
     _: User = Depends(security()),
     db: Session = Depends(session),
-) -> CellModelsPage:
+) -> CellsPage:
     """Get a listing of clouds."""
     return cells.read(db=db, limit=limit, offset=offset)

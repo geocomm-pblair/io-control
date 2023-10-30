@@ -1,9 +1,5 @@
-from typing import Literal
-from typing import Optional
 from typing import Tuple
 
-from pydantic import conint
-from pydantic import SecretStr
 from pydantic_settings import SettingsConfigDict
 
 from iocontrol.pydantic import BaseSettings
@@ -17,7 +13,7 @@ class SQLAlchemyConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix=env_prefix("sql"))
 
     models: Tuple[str] = Field(
-        default=("{{this}}.tenants.models",), description="model libraries"
+        default=("{{this}}.tenants.sqa",), description="model libraries"
     )
 
     echo: bool = Field(

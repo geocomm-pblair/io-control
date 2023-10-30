@@ -9,13 +9,13 @@ from iocontrol.api.auth.users import User
 from iocontrol.api.tenants.router import router
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import tenants
-from iocontrol.tenants.models import TenantModelsPage
+from iocontrol.tenants.pydantic.tenants import TenantsPage
 
 
 @router.get(
     "/",
     name="get-tenants",
-    response_model=TenantModelsPage,
+    response_model=TenantsPage,
     response_model_by_alias=True,
     response_model_exclude_none=True,
     responses=responses.errors,
@@ -29,6 +29,6 @@ async def get_tenants(
     ),
     _: User = Depends(security()),
     db: Session = Depends(session),
-) -> TenantModelsPage:
+) -> TenantsPage:
     """Get a listing of clouds."""
     return tenants.read(db=db, limit=limit, offset=offset)

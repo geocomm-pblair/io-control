@@ -1,25 +1,24 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
-from iocontrol.tenants.models import CloudModelsPage
-from iocontrol.tenants.models import CloudOrm
-from iocontrol.tenants.models import ReadCloudModel
+from iocontrol.tenants.pydantic.clouds import CloudsPage
+from iocontrol.tenants.pydantic.clouds import ReadCloud
+from iocontrol.tenants.sqa import CloudOrm
 
 
-def read(db: Session, offset: int = 0, limit: int = 100) -> CloudModelsPage:
+def read(db: Session, offset: int = 0, limit: int = 100) -> CloudsPage:
     """Get a page of clouds."""
-    # https://stackoverflow.com/questions/64371048/get-total-record-count-for-sqlalchemy-query-result-which-uses-paginationlimit
-    query = db.query(CloudOrm, func.count(CloudOrm.id).over().label("total"))
-    query.order_by(CloudOrm.id)
+    query = db.query(CloudOrm, func.count(CloudOrm.urn).over().label("total"))
+    query.order_by(CloudOrm.display_name)
     query.offset(offset).limit(limit)
     results = query.all()
     if len(results) == 0:
-        return CloudModelsPage(offset=offset, limit=limit, total=0)
-    return CloudModelsPage(
+        return CloudsPage(offset=offset, limit=limit, total=0)
+    return CloudsPage(
         offset=offset,
         limit=limit,
         total=results[0][1],
         clouds=tuple(
-            ReadCloudModel.model_validate(result[0]) for result in results
+            ReadCloud.model_validate(result[0]) for result in results
         ),
     )

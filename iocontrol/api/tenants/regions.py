@@ -9,13 +9,13 @@ from iocontrol.api.auth.users import User
 from iocontrol.api.tenants.router import router
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import regions
-from iocontrol.tenants.models import RegionModelsPage
+from iocontrol.tenants.pydantic.regions import RegionsPage
 
 
 @router.get(
     "/regions",
     name="get-regions",
-    response_model=RegionModelsPage,
+    response_model=RegionsPage,
     response_model_by_alias=True,
     response_model_exclude_none=True,
     responses=responses.errors,
@@ -29,6 +29,6 @@ async def get_regions(
     ),
     _: User = Depends(security()),
     db: Session = Depends(session),
-) -> RegionModelsPage:
+) -> RegionsPage:
     """Get a listing of clouds."""
     return regions.read(db=db, limit=limit, offset=offset)
