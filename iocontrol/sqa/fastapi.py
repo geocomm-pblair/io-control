@@ -1,5 +1,3 @@
-from sqlalchemy.orm import Session
-
 from iocontrol.sqa.engine import session_local
 
 

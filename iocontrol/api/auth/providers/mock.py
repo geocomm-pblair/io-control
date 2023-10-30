@@ -20,7 +20,7 @@ from iocontrol.errors import ConfigurationException
 
 
 @lru_cache()
-def debug_tags() -> Tuple[str, ...]:
+def tags() -> Tuple[str, ...]:
     """Get logging tags."""
     return "api", "auth", "mocks"
 
@@ -106,21 +106,21 @@ class MockSecurityProvider(SecurityProvider):
                 "The API is using the mock security module.  (This is fine "
                 "for development and testing deployments.)",
                 deploy_level=deploy_level,
-                tags=debug_tags(),
+                tags=tags(),
             )
         if deploy_level == DeployLevel.STAGING:
             logging.warn(
                 "The API is using the mock security module in a staging "
                 "deployment!",
                 deploy_level=deploy_level,
-                tags=debug_tags(),
+                tags=tags(),
             )
         if deploy_level >= DeployLevel.PRODUCTION:
             logging.error(
                 "Detected an attempt to use the mock security module in a "
                 "production (or higher) deployment!",
                 deploy_level=deploy_level,
-                tags=debug_tags(),
+                tags=tags(),
             )
             raise ConfigurationException(
                 "Cannot use the mock security module in a production "
