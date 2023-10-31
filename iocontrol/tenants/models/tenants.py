@@ -8,7 +8,6 @@ from pydantic import field_validator
 import iocontrol.pydantic
 from iocontrol.sqa.pages import Page
 from iocontrol.tenants.models.base import BaseModel
-from iocontrol.tenants.models.cells import ReadCell
 from iocontrol.tenants.models.plans import Plan
 
 
@@ -26,7 +25,9 @@ class Tenant(BaseModel):
     display_name: str = Field(
         alias="displayName", description="the display name"
     )
-    cell: ReadCell = Field(description="the cell in which the tenant resides")
+    cell_urn: str = Field(
+        description="identifies the cell in which the tenant resides"
+    )
     doc: TenantDetails = Field(
         default_factory=TenantDetails, description="tenant details"
     )

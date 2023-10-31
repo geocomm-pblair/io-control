@@ -39,7 +39,7 @@ def cloud_urns() -> Tuple[str]:
 
 # Cloud URNs
 CloudUrn = enum.Enum(
-    "CloudUrns", {c: f"urn:io:clouds:{c}" for c in cloud_urns()}
+    "CloudUrns", {c.split(":")[-1]: f"urn:io:clouds:{c}" for c in cloud_urns()}
 )
 
 

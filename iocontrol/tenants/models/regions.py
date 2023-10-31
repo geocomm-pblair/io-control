@@ -5,7 +5,6 @@ from pydantic import Field
 
 from iocontrol.sqa.pages import Page
 from iocontrol.tenants.models.base import BaseModel
-from iocontrol.tenants.models.clouds import ReadCloud
 
 
 class ReadRegion(BaseModel):
@@ -15,7 +14,7 @@ class ReadRegion(BaseModel):
     display_name: str = Field(
         alias="displayName", description="the display name"
     )
-    cloud: ReadCloud = Field(description="the cloud that hosts the region")
+    cloud_urn: str = Field(description="the cloud that hosts the region")
     # cells: Optional[Tuple["ReadCellModel", ...]] = Field(
     #     default=None,
     #     description="These are the cells presently hosted in this region.",

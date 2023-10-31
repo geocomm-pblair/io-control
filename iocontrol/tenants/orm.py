@@ -38,7 +38,7 @@ class Region(Orm):
 
     urn: Mapped[str] = mapped_column(primary_key=True)
     display_name: Mapped[str] = mapped_column()
-    cloud_id: Mapped[str] = mapped_column(ForeignKey("clouds.urn"))
+    cloud_urn: Mapped[str] = mapped_column(ForeignKey("clouds.urn"))
     cloud: Mapped[Cloud] = relationship(back_populates="regions")
     cells: Mapped[List["Cell"]] = relationship(back_populates="region")
 

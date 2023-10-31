@@ -1,7 +1,5 @@
 import importlib
 from functools import lru_cache
-from typing import cast
-from typing import Tuple
 
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -25,15 +23,16 @@ def engine() -> sqlalchemy.Engine:
         logging.info(
             f'Imported model module "{mod.__name__}" from "{mod.__file__}".',
             db=config().db.model_dump(),
-            sqa=config().sqa.model_dump(),
+            sqa=config().db.as_sqa(hide_secrets=True),
             module_name=mod.__name__,
             module_file=mod.__file__,
             tags=tags(__name__),
         )
     logging.info(
-        f"Creating SQLAlchemy engine for {config().db.as_sqa(hide_secrets=True)}",
+        f"Creating SQLAlchemy engine for "
+        f"{config().db.as_sqa(hide_secrets=True)}",
         db=config().db.model_dump(),
-        sqa=config().sqa.model_dump(),
+        sqa=config().db.as_sqa(hide_secrets=True),
         tags=tags(__name__),
     )
     # Create the engine.
