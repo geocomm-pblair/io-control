@@ -1,5 +1,7 @@
 import random as random_
+import re
 import string
+from functools import lru_cache
 
 import jinja2
 
@@ -31,3 +33,12 @@ def random(length: int = 32) -> str:
             string.ascii_uppercase + string.ascii_lowercase, k=length
         )
     )
+
+
+@lru_cache(maxsize=256)
+def urn(s: str, max_length=16) -> str:
+    """Format a string for inclusion in a URN"""
+    s1 = re.sub(r"[^\w\s_\-]", "", s)
+    s2 = re.sub(r"[\s_]", "-", s1)
+    s3 = s2.lower()[:max_length]
+    return re.sub(r"[^\w]$", "", s3)

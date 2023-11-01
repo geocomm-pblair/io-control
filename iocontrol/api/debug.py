@@ -9,7 +9,7 @@ from iocontrol.strings import random
 @lru_cache(maxsize=1)
 def tags() -> Tuple[str, ...]:
     """Get debugging tags."""
-    return ("fastapi",)
+    return ("fastapi.py",)
 
 
 @lru_cache(maxsize=1)

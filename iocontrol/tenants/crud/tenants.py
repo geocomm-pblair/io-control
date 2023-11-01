@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import Field
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
@@ -8,20 +6,19 @@ from iocontrol.tenants.models.tenants import CreateTenant
 from iocontrol.tenants.models.tenants import ReadTenant
 from iocontrol.tenants.models.tenants import TenantsPage
 from iocontrol.tenants.orm import Tenant
-from iocontrol.tenants.provisioning.base import ProvisioningState
 from iocontrol.tenants.provisioning.base import ProvisioningTask
+from iocontrol.tenants.provisioning.base import ProvisioningTypes
 
 
 class TenantProvisioningTask(ProvisioningTask):
     """A description of a tenant provisioning event."""
 
-    tenant: Optional[ReadTenant] = Field(
-        default=None, description="the tenant result"
+    type_: ProvisioningTypes = Field(
+        alias="type",
+        default=ProvisioningTypes.tenant,
+        description="the provisioning type",
     )
-
-
-def create(db: Session, tenant: CreateTenant) -> TenantProvisioningTask:
-    return TenantProvisioningTask(id="abc123", state=ProvisioningState.queued)
+    detail: CreateTenant = Field(description="describes the tenant to create")
 
 
 def read(db: Session, offset: int = 0, limit: int = 100) -> TenantsPage:

@@ -1,23 +1,16 @@
 from typing import Any
+from typing import Dict
+from typing import Optional
 from typing import Tuple
 
 from pydantic import ConfigDict
 from pydantic import Field
-from pydantic import field_validator
+from pydantic import model_validator
 from pydantic_geojson import PointModel
 
-import iocontrol.pydantic
+from iocontrol import strings
 from iocontrol.sqa.pages import Page
 from iocontrol.tenants.models.base import BaseModel
-from iocontrol.tenants.models.plans import Plan
-
-
-class TenantDetails(iocontrol.pydantic.BaseModel):
-    """Tenant details."""
-
-    plans: Tuple[Plan, ...] = Field(
-        default_factory=tuple, description="resource plans"
-    )
 
 
 class Tenant(BaseModel):
@@ -25,6 +18,10 @@ class Tenant(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
+    urn: str = Field(
+        description="identifies the tenant",
+        pattern=r"urn:io:tenant:(?P<id>[\w_-]*)",
+    )
     display_name: str = Field(
         alias="displayName", description="the display name"
     )
@@ -33,24 +30,40 @@ class Tenant(BaseModel):
 class CreateTenant(Tenant):
     """A new system tenant."""
 
+    # urn: Optional[str] = Field(
+    #     description="identifies the tenant",
+    #     # pattern=r"urn:io:tenant:[\w_-]*",
+    #     default=None
+    # )
+    urn: Optional[str] = Field(pattern=r"urn:io:tenant:[\w_-]*")
     location: PointModel = Field(description="the new tenant's location")
+
+    @model_validator(mode="before")
+    def validate_urn(cls, data: Any) -> Any:
+        """
+        Validate the ``urn`` field.
+
+        The function supplies a value based on the display name if no ``urn``
+        value is present in the arguments.
+        """
+        urn = data.get("urn")
+        if urn:
+            return data
+        data_ = dict(data)
+        display_name = data.get("displayName", data.get("display_name"))
+        data_["urn"] = f"urn:io:tenant:{strings.urn(display_name)}"
+        return data_
 
 
 class ReadTenant(Tenant):
     """A system tenant."""
 
-    urn: str = Field(description="identifies the tenant")
     cell_urn: str = Field(
         description="identifies the cell in which the tenant resides"
     )
-    doc: TenantDetails = Field(
-        default_factory=TenantDetails, description="tenant details"
+    doc: Optional[Dict[str, Any]] = Field(
+        default=None, description="tenant details"
     )
-
-    @field_validator("doc", mode="before")
-    def validate_doc(cls, v: Any) -> Any:
-        """Validate network."""
-        return v if v is not None else TenantDetails()
 
 
 class TenantsPage(Page):
