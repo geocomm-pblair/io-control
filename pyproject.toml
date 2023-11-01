@@ -31,9 +31,9 @@ pydantic = "2.4.0"
 pydantic-settings = "^2.0.3"
 sqlalchemy = "^2.0.21"
 geoalchemy2 = "^0.14.2"
-geojson-pydantic = "^1.0.1"
 shapely = "^2.0.2"
 jsonschema = "^4.19.2"
+pydantic-geojson = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

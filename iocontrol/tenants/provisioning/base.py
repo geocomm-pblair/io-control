@@ -1,7 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
 from enum import Enum
-from typing import Optional
+from typing import Tuple
 
 from pydantic import AnyHttpUrl
 from pydantic import Field
@@ -21,9 +21,17 @@ class ProvisioningState(Enum):
         https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dag-run.html
     """
 
+    queued = "queued"
+    running = "running"
     success = "success"
     failed = "failed"
-    skipped = "skipped"
+
+
+class ProvisioningRef(BaseModel):
+    """A provisioning task URL reference."""
+
+    type_: str = Field(description="the reference type")
+    url: AnyHttpUrl = Field(default=None, description="a reference URL")
 
 
 class ProvisioningTask(BaseModel):
@@ -35,8 +43,8 @@ class ProvisioningTask(BaseModel):
     state: ProvisioningState = Field(
         description="the state of the provisioning task"
     )
-    ref: Optional[AnyHttpUrl] = Field(
-        default=None, description="a reference URL"
+    refs: Tuple[ProvisioningRef, ...] = Field(
+        default_factory=tuple, description="a reference URL"
     )
 
 

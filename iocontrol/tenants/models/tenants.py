@@ -4,6 +4,7 @@ from typing import Tuple
 from pydantic import ConfigDict
 from pydantic import Field
 from pydantic import field_validator
+from pydantic_geojson import PointModel
 
 import iocontrol.pydantic
 from iocontrol.sqa.pages import Page
@@ -20,11 +21,25 @@ class TenantDetails(iocontrol.pydantic.BaseModel):
 
 
 class Tenant(BaseModel):
+    """A system tenant."""
+
     model_config = ConfigDict(frozen=True)
 
     display_name: str = Field(
         alias="displayName", description="the display name"
     )
+
+
+class CreateTenant(Tenant):
+    """A new system tenant."""
+
+    location: PointModel = Field(description="the new tenant's location")
+
+
+class ReadTenant(Tenant):
+    """A system tenant."""
+
+    urn: str = Field(description="identifies the tenant")
     cell_urn: str = Field(
         description="identifies the cell in which the tenant resides"
     )
@@ -36,10 +51,6 @@ class Tenant(BaseModel):
     def validate_doc(cls, v: Any) -> Any:
         """Validate network."""
         return v if v is not None else TenantDetails()
-
-
-class ReadTenant(Tenant):
-    urn: str = Field(description="identifies the tenant")
 
 
 class TenantsPage(Page):

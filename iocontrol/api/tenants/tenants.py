@@ -1,3 +1,4 @@
+from fastapi import Body
 from fastapi import Depends
 from fastapi import Query
 from pydantic import conint
@@ -9,6 +10,8 @@ from iocontrol.api.auth.users import User
 from iocontrol.api.tenants.router import router
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import tenants
+from iocontrol.tenants.crud.tenants import TenantProvisioningTask
+from iocontrol.tenants.models.tenants import CreateTenant
 from iocontrol.tenants.models.tenants import TenantsPage
 
 
@@ -32,3 +35,19 @@ async def get_tenants(
 ) -> TenantsPage:
     """Get a listing of clouds."""
     return tenants.read(db=db, limit=limit, offset=offset)
+
+
+@router.post(
+    "/",
+    name="create-tenant",
+    response_model=TenantProvisioningTask,
+    response_model_by_alias=True,
+    response_model_exclude_none=True,
+    responses=responses.errors,
+)
+async def create_tenant(
+    tenant: CreateTenant = Body(description="tenant details"),
+    _: User = Depends(security()),
+    db: Session = Depends(session),
+) -> TenantProvisioningTask:
+    return tenants.create(db=db, tenant=tenant)

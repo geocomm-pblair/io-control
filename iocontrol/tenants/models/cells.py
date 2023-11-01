@@ -31,6 +31,13 @@ class Cell(BaseModel):
     region: ReadRegion = Field(
         description="the region in which the cell resides"
     )
+
+
+class ReadCell(Cell):
+    """A cell."""
+
+    urn: str = Field(description="identifies the cell")
+
     doc: CellDetails = Field(
         default_factory=CellDetails, description="tenant details"
     )
@@ -39,12 +46,6 @@ class Cell(BaseModel):
     def validate_doc(cls, v: Any) -> Any:
         """Validate network."""
         return v if v is not None else CellDetails()
-
-
-class ReadCell(Cell):
-    """A cell."""
-
-    urn: str = Field(description="identifies the cell")
 
 
 class CellsPage(Page):
