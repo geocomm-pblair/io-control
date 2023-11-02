@@ -30,12 +30,7 @@ class Tenant(BaseModel):
 class CreateTenant(Tenant):
     """A new system tenant."""
 
-    # urn: Optional[str] = Field(
-    #     description="identifies the tenant",
-    #     # pattern=r"urn:io:tenant:[\w_-]*",
-    #     default=None
-    # )
-    urn: Optional[str] = Field(pattern=r"urn:io:tenant:[\w_-]*")
+    urn: Optional[str] = Field(default=None, pattern=r"urn:io:tenant:[\w_-]*")
     location: PointModel = Field(description="the new tenant's location")
 
     @model_validator(mode="before")

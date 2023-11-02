@@ -10,12 +10,12 @@ from iocontrol.api.auth.users import User
 from iocontrol.api.tenants.router import router
 from iocontrol.sqa.fastapi import session
 from iocontrol.tenants.crud import tenants
-from iocontrol.tenants.crud.tenants import TenantProvisioningTask
 from iocontrol.tenants.models.tenants import CreateTenant
 from iocontrol.tenants.models.tenants import TenantsPage
 from iocontrol.tenants.provisioning.base import Provisioner
 from iocontrol.tenants.provisioning.base import ProvisioningTask
 from iocontrol.tenants.provisioning.fastapi import provisioner
+from iocontrol.tenants.provisioning.tenants import TenantProvisioningTask
 
 
 @router.get(
@@ -54,4 +54,6 @@ async def create_tenant(
     db: Session = Depends(session),
     provisioner_: Provisioner = Depends(provisioner),
 ) -> ProvisioningTask:
-    return provisioner_.run(task=TenantProvisioningTask(detail=tenant), db=db)
+    return await provisioner_.run(
+        task=TenantProvisioningTask(detail=tenant), db=db
+    )

@@ -1,20 +1,26 @@
+from sqlalchemy.orm import Session
+
 from iocontrol.tenants.provisioning.base import Provisioner
 from iocontrol.tenants.provisioning.base import ProvisioningTask
 
 
 class AirflowProvisioner(Provisioner):
-    def run(self, task: ProvisioningTask) -> ProvisioningTask:
+    async def run(
+        self, task: ProvisioningTask, db: Session
+    ) -> ProvisioningTask:
         """
         Execute a provisioning plan.
 
         :param task: the plan
+        :param db: a database session
         :returns: an update provisioning task
         """
 
-    def status(self, id_: str) -> ProvisioningTask:
+    async def task(self, uid: str, db: Session) -> ProvisioningTask:
         """
         Get the state of a provisioning task.
 
-        :param id_: the task identifier
+        :param uid: the task identifier
+        :param db: a database session
         :returns: the provisioning task definition
         """

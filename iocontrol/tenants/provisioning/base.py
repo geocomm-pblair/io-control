@@ -32,7 +32,7 @@ class ProvisioningState(Enum):
     failed = "failed"
 
 
-class ProvisioningTypes(Enum):
+class ProvisioningStructures(Enum):
     """Provisioning types."""
 
     tenant = "tenant"
@@ -42,20 +42,19 @@ class ProvisioningTypes(Enum):
 class ProvisioningRef(BaseModel):
     """A provisioning task URL reference."""
 
-    type_: str = Field(description="the reference type")
+    category: str = Field(description="the reference type")
     url: AnyHttpUrl = Field(default=None, description="a reference URL")
 
 
 class ProvisioningTask(BaseModel):
     """A provisioning task."""
 
-    id_: Optional[str] = Field(
-        alias="id",
+    uid: Optional[str] = Field(
         default=None,
         description="identifies the provisioning task",
     )
-    type_: ProvisioningTypes = Field(
-        alias="type", description="the provisioning type"
+    structure: ProvisioningStructures = Field(
+        description="the provisioning type"
     )
     created: datetime = Field(
         default_factory=datetime.utcnow,
@@ -68,6 +67,9 @@ class ProvisioningTask(BaseModel):
     refs: Tuple[ProvisioningRef, ...] = Field(
         default_factory=tuple, description="a reference URL"
     )
+    meta: Optional[Dict[str, Any]] = Field(
+        default=None, description="provisioner metadata"
+    )
     detail: Dict[str, Any] = Field(
         default_factory=dict, description="provisioning task details"
     )
@@ -79,8 +81,15 @@ class ProvisioningTask(BaseModel):
 class Provisioner(ABC):
     """A provisioning service."""
 
+    @classmethod
+    def type(cls) -> str:
+        """Get the identifier for the provisioner type."""
+        return f"{cls.__module__}.{cls.__name__}"
+
     @abstractmethod
-    def run(self, task: ProvisioningTask, db: Session) -> ProvisioningTask:
+    async def run(
+        self, task: ProvisioningTask, db: Session
+    ) -> ProvisioningTask:
         """
         Execute a provisioning plan.
 
@@ -90,11 +99,11 @@ class Provisioner(ABC):
         """
 
     @abstractmethod
-    def status(self, id_: str, db: Session) -> ProvisioningTask:
+    async def task(self, uid: str, db: Session) -> ProvisioningTask:
         """
         Get the state of a provisioning task.
 
-        :param id_: the task identifier
+        :param uid: the task identifier
         :param db: a database session
         :returns: the provisioning task definition
         """

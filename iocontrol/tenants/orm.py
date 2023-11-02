@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from geoalchemy2 import Geometry
@@ -99,3 +100,11 @@ class Tenant(Orm):
         back_populates="tenant"
     )
     geom = deferred(Column(Geometry("MULTIPOLYGON", srid=4326)))
+
+
+class ProvisioningTask(Orm):
+    __tablename__ = "provisioning_tasks"
+
+    uid: Mapped[str] = mapped_column(primary_key=True)
+    provisioner: Mapped[str] = mapped_column(nullable=False, index=True)
+    created: Mapped[datetime] = mapped_column(nullable=False, index=True)
