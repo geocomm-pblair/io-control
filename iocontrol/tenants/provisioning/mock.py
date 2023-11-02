@@ -49,13 +49,16 @@ class MockProvisioner(Provisioner):
         )
         db.add(orm_task)
         db.commit()
+
         # Now pretend we outsourced the work.
         doc = dict(orm_task.doc)
         doc["state"] = "success"
-        # TODO: Create the actual tenant.
-
+        doc["result"] = {
+            "mock": "This is a mock result. We didn't actually do anything."
+        }
         orm_task.doc = doc
         db.commit()
+
         # Remove the metadata from the object we return.
         return task_.model_validate({**task_.model_dump(), **dict(meta=None)})
 
@@ -79,6 +82,7 @@ class MockProvisioner(Provisioner):
         doc = dict(orm_task.doc)
         doctype = doc.get("meta", {}).get("$doctype")
         doccls: Any = pycls(doctype)
+        del doc["meta"]
         task = doccls.model_validate(doc)
         # Perform consistency checks between the document and the ORM fields.
         if not uid == task.uid:
