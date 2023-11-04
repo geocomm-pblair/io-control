@@ -80,7 +80,7 @@ class Cell(Orm):
     urn: Mapped[str] = mapped_column(primary_key=True)
     display_name: Mapped[str] = mapped_column(unique=True)
     max_tenants: Mapped[int] = mapped_column(default=500, server_default="500")
-    region_id: Mapped[str] = mapped_column(ForeignKey("regions.urn"))
+    region_urn: Mapped[str] = mapped_column(ForeignKey("regions.urn"))
     region: Mapped[Region] = relationship(back_populates="cells")
     tenants: Mapped[List["Tenant"]] = relationship(back_populates="cell")
     ipv4networks: Mapped[List["CellIpV4Network"]] = relationship(

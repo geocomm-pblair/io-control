@@ -8,7 +8,6 @@ from pydantic import Field
 
 from iocontrol.sqa.pages import Page
 from iocontrol.tenants.models.base import BaseModel
-from iocontrol.tenants.models.regions import ReadRegion
 
 
 class Cell(BaseModel):
@@ -19,8 +18,8 @@ class Cell(BaseModel):
     display_name: str = Field(
         alias="displayName", description="the display name"
     )
-    region: ReadRegion = Field(
-        description="the region in which the cell resides"
+    region_urn: str = Field(
+        description="identifies the region in which the cell resides"
     )
 
 
